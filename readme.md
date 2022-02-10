@@ -95,3 +95,11 @@ viewport and display it in some sort of a status bar. This will be useful for
 transferring over coordinates from the viewport to the acrylic when it comes to
 drilling/marking holes for cables going from the bottom part of the track thru
 to the back side of the acrylic.
+
+### Add support for local import and export to be able to preserve the models
+
+Saving to and loading from a file should be implemented on top of the current
+behavior of keeping the code stored in the local storage in the browser. This
+will be parallel to the export to OpenSCAD/STL/GCode feature I am planning, the
+difference being that this feature will work with the raw source code this tool
+is processing.
