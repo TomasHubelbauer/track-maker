@@ -87,3 +87,11 @@ options here. In the first iteration, I will likely just add the flag to every
 argument and should a missing argument error come up, I will wrap that in a
 condition not to check that if the argument is optional and probably short
 circuit.
+
+### Display current coordinates while hovering over the canvas
+
+Translate the position of the cursor to the coordinate system of the CAD
+viewport and display it in some sort of a status bar. This will be useful for
+transferring over coordinates from the viewport to the acrylic when it comes to
+drilling/marking holes for cables going from the bottom part of the track thru
+to the back side of the acrylic.
