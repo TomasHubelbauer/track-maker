@@ -54,3 +54,20 @@ so this tool should reflect that.
 
 Implement scaling the viewport using the scroll wheel / gesture, but do not
 scale the numbers displayed in the UI hints etc.
+
+### Implement opening a reference to trace over
+
+The main idea of this tool is to enable designing tracks for LED strips that
+make up a logo together. To be able to design the logos, often tracing over a
+reference is the best way to get a rough sketch out and tweak it further.
+
+I will implement opening up an image and placing it beneath the sketch. I am not
+sure about the UI yet, but most likely I will add a new command called `ref` or
+`reference` (or both) that will force-open a file selector modal and once the
+file is selected, it will automatically add its name as its argument so that it
+knows not to ask for the file again.
+
+If the user changes the name, the application will open the file selector modal
+again letting them choose another file or cancel. Choosing a new file will make
+the file name argument of the command the name of the new file. Canceling will
+reset the changes the user made to the file name to the file name selected last.
