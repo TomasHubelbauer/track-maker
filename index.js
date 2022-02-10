@@ -47,8 +47,8 @@ function render() {
   const context = canvas.getContext('2d');
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  let x = 0;
-  let y = 0;
+  let cursorX = 0;
+  let cursorY = 0;
   context.moveTo(panX, panY);
 
   const hints = [];
@@ -67,62 +67,62 @@ function render() {
       }
 
       case 'horizontal-line': case 'h': case 'x': {
-        const error = checkArguments(args, 'x');
-        if (error) {
-          hints.push(error);
+        const { hint, values: { x } } = checkArguments(args, { name: 'x', type: 'number' });
+        if (hint) {
+          hints.push(hint);
           break next;
         }
 
-        x += +args[0];
-        context.lineTo(panX + x, panY + y);
-        hints.push(`${x}×${y}`);
+        cursorX += x;
+        context.lineTo(panX + cursorX, panY + cursorY);
+        hints.push(`${cursorX}×${cursorY}`);
         break;
       }
       case 'vertical-line': case 'v': case 'y': {
-        const error = checkArguments(args, 'y');
-        if (error) {
-          hints.push(error);
+        const { hint, values: { y } } = checkArguments(args, { name: 'y', type: 'number' });
+        if (hint) {
+          hints.push(hint);
           break next;
         }
 
-        y += +args[0];
-        context.lineTo(panX + x, panY + y);
-        hints.push(`${x}×${y}`);
+        cursorY += y;
+        context.lineTo(panX + cursorX, panY + cursorY);
+        hints.push(`${cursorX}×${cursorY}`);
         break;
       }
       case 'line': case 'l': {
-        const error = checkArguments(args, 'x', 'y');
-        if (error) {
-          hints.push(error);
+        const { hint, values: { x, y } } = checkArguments(args, { name: 'x', type: 'number' }, { name: 'y', type: 'number' });
+        if (hint) {
+          hints.push(hint);
           break next;
         }
 
-        x += +args[0];
-        y += +args[1];
-        context.lineTo(panX + x, panY + y);
-        hints.push(`${x}×${y}`);
+        cursorX += x;
+        cursorY += y;
+        context.lineTo(panX + cursorX, panY + cursorY);
+        hints.push(`${cursorX}×${cursorY}`);
         break;
       }
       case 'arc': case 'a': {
-        const error = checkArguments(args, 'x', 'y', 'radius', 'flip');
-        if (error) {
-          hints.push(error);
+        const { hint, values: { x, y, radius, flip } } = checkArguments(args, { name: 'x', type: 'number' }, { name: 'y', type: 'number' }, { name: 'radius', type: 'number' }, { name: 'flip', type: 'boolean' });
+        if (hint) {
+          hints.push(hint);
           break next;
         }
 
         // TODO: Implement as per https://stackoverflow.com/a/58824801/2715716
         // TODO: Figure out how to translate to https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arcTo
-        const shiftX = +args[2] * Math.sign(+args[0] * (args[3] === 'true' ? 1 : -1));
-        const shiftY = +args[2] * Math.sign(+args[1] * (args[3] === 'true' ? 1 : -1));
-        const controlX = panX + x + (+args[0] / 2) + shiftX;
-        const controlY = panY + y + (+args[1] / 2) - shiftY;
+        const shiftX = radius * Math.sign(x * (flip ? 1 : -1));
+        const shiftY = radius * Math.sign(y * (flip ? 1 : -1));
+        const controlX = panX + cursorX + (x / 2) + shiftX;
+        const controlY = panY + cursorY + (y / 2) - shiftY;
         context.fillText('. control', controlX, controlY);
 
-        x += +args[0];
-        y += +args[1];
+        cursorX += x;
+        cursorY += y;
 
-        context.quadraticCurveTo(controlX, controlY, panX + x, panY + y);
-        hints.push(`${x}×${y}`);
+        context.quadraticCurveTo(controlX, controlY, panX + cursorX, panY + cursorY);
+        hints.push(`${cursorX}×${cursorY}`);
         break;
       }
       default: {
@@ -183,15 +183,69 @@ function renderHints(hints) {
 }
 
 /** @param {string[]} args */
-/** @param {string[]} names */
-function checkArguments(args, ...names) {
-  if (names.length === args.length) {
-    return;
+/** @param {({ name: string; } & ({ type: 'string'; } | { type: 'number'; } | { type: 'enum'; options: string[]; }))[]} params */
+function checkArguments(args, ...params) {
+  const values = {};
+  const hints = [];
+
+  for (let index = 0; index < params.length; index++) {
+    const arg = args[index];
+    const param = params[index];
+
+    // Short-circuit in case not all arguments are provided yet, are `undefined`
+    if (arg === undefined) {
+      hints.push('argument missing: ' + param.name);
+      break;
+    }
+
+    switch (param.type) {
+      // Pass string arguments as-is, no parsing is needed
+      case 'string': {
+        values[param.name] = arg;
+        break;
+      }
+      // Convert numerical arguments to actual JavaScript numbers
+      case 'number': {
+        const value = +arg;
+
+        if (Number.isNaN(value)) {
+          hints.push(`${param.name}: '${arg}' is not a number`);
+        }
+        else {
+          values[param.name] = value;
+        }
+
+        break;
+      }
+      case 'enum': {
+        if (!param.options.includes(arg)) {
+          hints.push(`${param.name}: '${arg}' is not in ${param.options}`);
+        }
+        else {
+          values[param.name] = value;
+        }
+
+        break;
+      }
+      case 'boolean': {
+        if (arg !== 'true' && arg !== 'false' && arg !== '0' && arg !== '1') {
+          hints.push(`${param.name}: '${arg}' is not a boolean (true/false, 1/0)`);
+        }
+        else {
+          values[param.name] = arg === 'true' || arg === '1';
+        }
+
+        break;
+      }
+      default: {
+        throw new Error(`Invalid '${param.name}' param type '${param.type}'! Need one of string, number, enum.`);
+      }
+    }
   }
 
-  if (args.length > names.length) {
-    return (args.length - names.length) + ' too many arguments';
+  if (args.length > params.length) {
+    hints.push((args.length - params.length) + ' too many arguments');
   }
 
-  return 'argument needed: ' + names[args.length];
+  return { hint: hints.join(' | '), values };
 }
