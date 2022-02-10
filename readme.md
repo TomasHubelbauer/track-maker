@@ -55,19 +55,35 @@ so this tool should reflect that.
 Implement scaling the viewport using the scroll wheel / gesture, but do not
 scale the numbers displayed in the UI hints etc.
 
-### Implement opening a reference to trace over
+### Implement opening a reference to trace over from a local file
 
-The main idea of this tool is to enable designing tracks for LED strips that
-make up a logo together. To be able to design the logos, often tracing over a
-reference is the best way to get a rough sketch out and tweak it further.
+I have implemented opening references from a URL, but local file will be needed
+as well.
 
-I will implement opening up an image and placing it beneath the sketch. I am not
-sure about the UI yet, but most likely I will add a new command called `ref` or
-`reference` (or both) that will force-open a file selector modal and once the
-file is selected, it will automatically add its name as its argument so that it
-knows not to ask for the file again.
+In that case, force-open a file selector modal and once the file is selected, it
+will automatically add its name as the command's argument so that it knows not
+to ask for the file again - it will be in the `cache`.
 
 If the user changes the name, the application will open the file selector modal
 again letting them choose another file or cancel. Choosing a new file will make
 the file name argument of the command the name of the new file. Canceling will
 reset the changes the user made to the file name to the file name selected last.
+
+Since there can be multiple references, it is important to cross-check the caret
+position when a name of a local file reference is edited and when a new file is
+chosen, update the argument of that reference and not the first/last reference
+or something silly like that.
+
+### Add support for optional arguments and support resizing and cropping the ref
+
+The reference might be able to use some cropping and resizing, but it will not
+always be necessary, so for good user experience, let's add support for making
+some parameters in `checkArguments` optional. It will likely be enough to make
+the first one as optional, but it will mean we need to check and warn when the
+follow-on ones aren't marked as such. Maybe it will be better to redo the API of
+the `checkArguments` method and have two arrays, one for required and one for
+optional parameters. I'll need to think about the effort/gain ratios of various
+options here. In the first iteration, I will likely just add the flag to every
+argument and should a missing argument error come up, I will wrap that in a
+condition not to check that if the argument is optional and probably short
+circuit.

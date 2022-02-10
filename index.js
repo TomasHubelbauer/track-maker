@@ -1,6 +1,8 @@
 const canvas = document.querySelector('canvas');
 const textArea = document.querySelector('textarea');
 
+const cache = {};
+
 // Center the origin within the viewport at startup
 let panX = canvas.clientWidth / 2;
 let panY = canvas.clientHeight / 2;
@@ -65,7 +67,38 @@ function render() {
         hints.push('skipped');
         break;
       }
+      case 'reference': case 'ref': {
+        const { hint, values: { url, x, y } } = checkArguments(args, { name: 'url', type: 'string' }, { name: 'x', type: 'number' }, { name: 'y', type: 'number' });
+        if (hint) {
+          hints.push(hint);
+          break next;
+        }
 
+        if (cache[url]) {
+          hints.push(cache[url].status);
+          context.drawImage(cache[url].img, x, y);
+        }
+        else {
+          hints.push('downloading…');
+
+          const img = document.createElement('img');
+          img.src = url;
+
+          img.addEventListener('load', () => {
+            const metadata = `${img.naturalWidth}×${img.naturalHeight}`;
+            cache[url] = { status: 'downloaded, ' + metadata, img };
+            textArea.dispatchEvent(new Event('input'));
+            cache[url] = { status: 'cached, ' + metadata, img };
+          });
+
+          img.addEventListener('error', () => {
+            cache[url] = { status: 'failed to download' };
+            textArea.dispatchEvent(new Event('input'));
+          });
+        }
+
+        break;
+      }
       case 'horizontal-line': case 'h': case 'x': {
         const { hint, values: { x } } = checkArguments(args, { name: 'x', type: 'number' });
         if (hint) {
