@@ -109,8 +109,3 @@ also be used to display the current coordinate at the cursor location.
 
 Currently it zooms in and out from the origin, but I think this could be
 improved.
-
-### Capture pinch gestures and translate them to zoom gestures like the wheel
-
-Currently the canvas only reacts to the mouse wheel, but pinch gestures should
-also be supported to provide intuitive UX.
