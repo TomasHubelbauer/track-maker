@@ -1,4 +1,8 @@
 body {
+  font: icon;
+}
+
+div {
   display: flex;
   gap: 1ex;
 }

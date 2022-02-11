@@ -1,15 +1,18 @@
 const canvas = document.querySelector('canvas');
 const textArea = document.querySelector('textarea');
+const footer = document.querySelector('footer');
 
 const cache = {};
 
-// Center the origin within the viewport at startup
-let panX = canvas.clientWidth / 2;
-let panY = canvas.clientHeight / 2;
+// Center the origin within the viewport at startup (coerce to whole numbers)
+let panX = ~~(canvas.clientWidth / 2);
+let panY = ~~(canvas.clientHeight / 2);
 
 let zoom = 1;
 
 canvas.addEventListener('mousemove', event => {
+  footer.textContent = `${event.offsetX - panX}×${event.offsetY - panY}`;
+
   if (event.buttons !== 1) {
     return;
   }

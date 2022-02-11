@@ -45,7 +45,7 @@ end goal is to draw the track thick enough to fit the LED strip as well as the
 side walls that keep the LED strip in. This will require some math, so I have
 not added it yet.
 
-### Change the coordinate system to match the OpenSCAD one
+### Change the coordinate system to match the OpenSCAD one (reversed Y axis)
 
 The vertical axis seems to be reversed in OpenSCAD and probably CAD in general,
 so this tool should reflect that.
@@ -83,14 +83,6 @@ argument and should a missing argument error come up, I will wrap that in a
 condition not to check that if the argument is optional and probably short
 circuit.
 
-### Display current coordinates while hovering over the canvas
-
-Translate the position of the cursor to the coordinate system of the CAD
-viewport and display it in some sort of a status bar. This will be useful for
-transferring over coordinates from the viewport to the acrylic when it comes to
-drilling/marking holes for cables going from the bottom part of the track thru
-to the back side of the acrylic.
-
 ### Add support for local import and export to be able to preserve the models
 
 Saving to and loading from a file should be implemented on top of the current
@@ -99,11 +91,16 @@ will be parallel to the export to OpenSCAD/STL/GCode feature I am planning, the
 difference being that this feature will work with the raw source code this tool
 is processing.
 
-### Display current zoom level in the UI - probably some sort of a menu / status
+### Display current zoom level in the status bar
 
-Introduce a menu bar, it will be needed for the file import/export feature
-anyway, and also introduce a status bar and show the zoom level in it. It will
-also be used to display the current coordinate at the cursor location.
+Split it into parts and update only the zoom part, the other part being the
+current coordinates in the CAD coordinate space for now.
+
+### Clear the current coordinates cell of the status bar when out of the canvas
+
+Right now the last coordinates remain displayed, but we should empty the cell
+displaying them when it is not applicable - when the cursor is not within the
+canvas.
 
 ### Make the viewport zoom in and out of the point at which the cursor is
 
