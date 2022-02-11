@@ -50,11 +50,6 @@ not added it yet.
 The vertical axis seems to be reversed in OpenSCAD and probably CAD in general,
 so this tool should reflect that.
 
-### Implement zooming the viewport without affecting the coordinates rendered
-
-Implement scaling the viewport using the scroll wheel / gesture, but do not
-scale the numbers displayed in the UI hints etc.
-
 ### Implement opening a reference to trace over from a local file
 
 I have implemented opening references from a URL, but local file will be needed
@@ -103,3 +98,19 @@ behavior of keeping the code stored in the local storage in the browser. This
 will be parallel to the export to OpenSCAD/STL/GCode feature I am planning, the
 difference being that this feature will work with the raw source code this tool
 is processing.
+
+### Display current zoom level in the UI - probably some sort of a menu / status
+
+Introduce a menu bar, it will be needed for the file import/export feature
+anyway, and also introduce a status bar and show the zoom level in it. It will
+also be used to display the current coordinate at the cursor location.
+
+### Make the viewport zoom in and out of the point at which the cursor is
+
+Currently it zooms in and out from the origin, but I think this could be
+improved.
+
+### Capture pinch gestures and translate them to zoom gestures like the wheel
+
+Currently the canvas only reacts to the mouse wheel, but pinch gestures should
+also be supported to provide intuitive UX.
