@@ -7,6 +7,8 @@ const cache = {};
 let panX = canvas.clientWidth / 2;
 let panY = canvas.clientHeight / 2;
 
+let zoom = 1;
+
 canvas.addEventListener('mousemove', event => {
   if (event.buttons !== 1) {
     return;
@@ -14,6 +16,13 @@ canvas.addEventListener('mousemove', event => {
 
   panX += event.movementX;
   panY += event.movementY;
+
+  // Discard rendering hints as the source code has not changed by panning
+  render();
+});
+
+canvas.addEventListener('wheel', event => {
+  zoom += event.deltaY / 100;
 
   // Discard rendering hints as the source code has not changed by panning
   render();
@@ -76,7 +85,8 @@ function render() {
 
         if (cache[url]) {
           hints.push(cache[url].status);
-          context.drawImage(cache[url].img, panX + x, panY + y);
+          const img = cache[url].img;
+          context.drawImage(img, panX + x * zoom, panY + y * zoom, img.naturalWidth * zoom, img.naturalHeight * zoom);
         }
         else {
           hints.push('downloading…');
@@ -107,7 +117,7 @@ function render() {
         }
 
         cursorX += x;
-        context.lineTo(panX + cursorX, panY + cursorY);
+        context.lineTo(panX + cursorX * zoom, panY + cursorY * zoom);
         hints.push(`${cursorX}×${cursorY}`);
         break;
       }
@@ -119,7 +129,7 @@ function render() {
         }
 
         cursorY += y;
-        context.lineTo(panX + cursorX, panY + cursorY);
+        context.lineTo(panX + cursorX * zoom, panY + cursorY * zoom);
         hints.push(`${cursorX}×${cursorY}`);
         break;
       }
@@ -132,7 +142,7 @@ function render() {
 
         cursorX += x;
         cursorY += y;
-        context.lineTo(panX + cursorX, panY + cursorY);
+        context.lineTo(panX + cursorX * zoom, panY + cursorY * zoom);
         hints.push(`${cursorX}×${cursorY}`);
         break;
       }
@@ -147,14 +157,14 @@ function render() {
         // TODO: Figure out how to translate to https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arcTo
         const shiftX = radius * Math.sign(x * (flip ? 1 : -1));
         const shiftY = radius * Math.sign(y * (flip ? 1 : -1));
-        const controlX = panX + cursorX + (x / 2) + shiftX;
-        const controlY = panY + cursorY + (y / 2) - shiftY;
+        const controlX = panX + (cursorX + (x / 2) + shiftX) * zoom;
+        const controlY = panY + (cursorY + (y / 2) - shiftY) * zoom;
         context.fillText('. control', controlX, controlY);
 
         cursorX += x;
         cursorY += y;
 
-        context.quadraticCurveTo(controlX, controlY, panX + cursorX, panY + cursorY);
+        context.quadraticCurveTo(controlX, controlY, panX + cursorX * zoom, panY + cursorY * zoom);
         hints.push(`${cursorX}×${cursorY}`);
         break;
       }
