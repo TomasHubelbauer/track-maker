@@ -76,7 +76,7 @@ function render() {
 
         if (cache[url]) {
           hints.push(cache[url].status);
-          context.drawImage(cache[url].img, x, y);
+          context.drawImage(cache[url].img, panX + x, panY + y);
         }
         else {
           hints.push('downloading…');
