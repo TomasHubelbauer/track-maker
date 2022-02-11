@@ -96,12 +96,6 @@ is processing.
 Split it into parts and update only the zoom part, the other part being the
 current coordinates in the CAD coordinate space for now.
 
-### Clear the current coordinates cell of the status bar when out of the canvas
-
-Right now the last coordinates remain displayed, but we should empty the cell
-displaying them when it is not applicable - when the cursor is not within the
-canvas.
-
 ### Make the viewport zoom in and out of the point at which the cursor is
 
 Currently it zooms in and out from the origin, but I think this could be

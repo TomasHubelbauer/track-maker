@@ -24,6 +24,8 @@ canvas.addEventListener('mousemove', event => {
   render();
 });
 
+canvas.addEventListener('mouseleave', () => footer.textContent = '');
+
 canvas.addEventListener('gesturechange', event => {
   console.log(event.scale);
 });
