@@ -1,9 +1,12 @@
+import renderHints from './renderHints.js';
+import download from './download.js';
+import { set } from './references.js';
+import render from './render.js';
+
 /** @type {HTMLInputElement} */
 const fileInput = document.querySelector('#fileInput');
 /** @type {HTMLInputElement} */
 const referenceInput = document.querySelector('#referenceInput');
-/** @type {HTMLAnchorElement} */
-const saveA = document.querySelector('#saveA');
 /** @type {HTMLButtonElement} */
 const openButton = document.querySelector('#openButton');
 /** @type {HTMLButtonElement} */
@@ -26,8 +29,6 @@ const textArea = document.querySelector('textarea');
 const zoomDiv = document.querySelector('#zoomDiv');
 /** @type {HTMLDivElement} */
 const coordsDiv = document.querySelector('#coordsDiv');
-
-const cache = {};
 
 // Center the origin within the viewport at startup (coerce to whole numbers)
 let panX = ~~(canvas.clientWidth / 2);
@@ -63,7 +64,7 @@ referenceInput.addEventListener('change', () => {
 
   const file = referenceInput.files[0];
   const url = URL.createObjectURL(file);
-  cacheReference(url, file.name);
+  set(url, file.name);
 
   textArea.value = `reference ${file.name} 0 0\n` + textArea.value;
 });
@@ -118,10 +119,11 @@ canvas.addEventListener('mousemove', event => {
   panY += event.movementY;
 
   // Discard rendering hints as the source code has not changed by panning
-  render();
+  render(panX, panY, zoom);
 });
 
 canvas.addEventListener('mouseleave', () => coordsDiv.textContent = '0×0');
+
 canvas.addEventListener('wheel', event => {
   // Prevent the whole page from zooming in and out or scrolling if scrollable
   event.preventDefault();
@@ -144,12 +146,12 @@ canvas.addEventListener('wheel', event => {
   zoomDiv.textContent = ~~(zoom * 100) + ' %';
 
   // Discard rendering hints as the source code has not changed by panning
-  render();
+  render(panX, panY, zoom);
 });
 
 textArea.addEventListener('input', () => {
   localStorage.setItem('code', textArea.value);
-  const hints = render();
+  const hints = render(panX, panY, zoom);
   renderHints(hints);
 });
 
@@ -172,7 +174,7 @@ zoomDiv.addEventListener('click', () => {
   zoomDiv.textContent = ~~(zoom * 100) + ' %';
 
   // Discard rendering hints as the source code has not changed by panning
-  render();
+  render(panX, panY, zoom);
 });
 
 coordsDiv.addEventListener('click', () => {
@@ -181,305 +183,9 @@ coordsDiv.addEventListener('click', () => {
   panY = ~~(canvas.clientHeight / 2);
 
   // Discard rendering hints as the source code has not changed by panning
-  render();
+  render(panX, panY, zoom);
 });
 
 // Dispatch `input` event even for initial text recovery so the associated event
 // handler runs even on the initial page load.
 textArea.dispatchEvent(new Event('input'));
-
-function render() {
-  const { width, height } = canvas.getBoundingClientRect();
-  canvas.width = width;
-  canvas.height = height;
-
-  const context = canvas.getContext('2d');
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  let cursorX = 0;
-  let cursorY = 0;
-  context.moveTo(panX, panY);
-
-  const hints = [];
-  const lines = textArea.value.split('\n').map(line => line.trim());
-  next: for (const line of lines) {
-    // Skip commented out or empty lines but push a hint to keep 1:1 with lines
-    if (line === '' || line.startsWith('//')) {
-      hints.push('');
-      continue;
-    }
-
-    const [command, ...args] = line.split(' ').map(part => part.trim());
-    switch (command) {
-      case 'reference': case 'ref': {
-        const { hint, values: { url, x, y } } = checkArguments(args, [
-          { name: 'url', type: 'string' }
-        ], [
-          { name: 'x', type: 'number', default: 0 },
-          { name: 'y', type: 'number', default: 0 }
-        ]);
-
-        if (hint) {
-          hints.push(hint);
-          break next;
-        }
-
-        if (cache[url]) {
-          const { status, img } = cache[url];
-          hints.push(status);
-          if (img) {
-            context.drawImage(img, panX + x * zoom, panY + y * zoom, img.naturalWidth * zoom, img.naturalHeight * zoom);
-          }
-        }
-        else {
-          hints.push('downloading…');
-          cacheReference(url);
-        }
-
-        break;
-      }
-      case 'horizontal-line': case 'h': case 'x': {
-        const { hint, values: { x } } = checkArguments(args, [
-          { name: 'x', type: 'number' }
-        ]);
-
-        if (hint) {
-          hints.push(hint);
-          break next;
-        }
-
-        cursorX += x;
-        context.lineTo(panX + cursorX * zoom, panY + cursorY * zoom);
-        hints.push(`${cursorX}×${cursorY}`);
-        break;
-      }
-      case 'vertical-line': case 'v': case 'y': {
-        const { hint, values: { y } } = checkArguments(args, [
-          { name: 'y', type: 'number' }
-        ]);
-
-        if (hint) {
-          hints.push(hint);
-          break next;
-        }
-
-        cursorY += y;
-        context.lineTo(panX + cursorX * zoom, panY + cursorY * zoom);
-        hints.push(`${cursorX}×${cursorY}`);
-        break;
-      }
-      case 'line': case 'l': {
-        const { hint, values: { x, y } } = checkArguments(args, [
-          { name: 'x', type: 'number' },
-          { name: 'y', type: 'number' }
-        ]);
-
-        if (hint) {
-          hints.push(hint);
-          break next;
-        }
-
-        cursorX += x;
-        cursorY += y;
-        context.lineTo(panX + cursorX * zoom, panY + cursorY * zoom);
-        hints.push(`${cursorX}×${cursorY}`);
-        break;
-      }
-      case 'arc': case 'a': {
-        const { hint, values: { x, y, radius, flip } } = checkArguments(args, [
-          { name: 'x', type: 'number' },
-          { name: 'y', type: 'number' },
-          { name: 'radius', type: 'number' }
-        ], [
-          { name: 'flip', type: 'boolean' }
-        ]);
-
-        if (hint) {
-          hints.push(hint);
-          break next;
-        }
-
-        // TODO: Implement as per https://stackoverflow.com/a/58824801/2715716
-        // TODO: Figure out how to translate to https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arcTo
-        const shiftX = radius * Math.sign(x * (flip ? 1 : -1));
-        const shiftY = radius * Math.sign(y * (flip ? 1 : -1));
-        const controlX = panX + (cursorX + (x / 2) + shiftX) * zoom;
-        const controlY = panY + (cursorY + (y / 2) - shiftY) * zoom;
-        context.fillText('. control', controlX, controlY);
-
-        cursorX += x;
-        cursorY += y;
-
-        context.quadraticCurveTo(controlX, controlY, panX + cursorX * zoom, panY + cursorY * zoom);
-        hints.push(`${cursorX}×${cursorY}`);
-        break;
-      }
-      default: {
-        hints.push(`unknown command '${command}'`);
-      }
-    }
-  }
-
-  context.stroke();
-  return hints;
-}
-
-/** @param {string} url */
-/** @param {string} name */
-function cacheReference(url, name) {
-  const img = document.createElement('img');
-  img.src = url;
-
-  img.addEventListener('load', () => {
-    const metadata = `${img.naturalWidth}×${img.naturalHeight}`;
-    cache[name ?? url] = { status: 'downloaded, ' + metadata, img };
-    textArea.dispatchEvent(new Event('input'));
-    cache[name ?? url] = { status: 'cached, ' + metadata, img };
-  });
-
-  img.addEventListener('error', () => {
-    cache[name ?? url] = { status: 'failed to download' };
-    textArea.dispatchEvent(new Event('input'));
-  });
-}
-
-/** @param {Blob} blob */
-/** @param {string} extension */
-function download(blob, extension) {
-  saveA.href = URL.createObjectURL(blob);
-  if (nameInput.value !== '') {
-    saveA.download = nameInput.value.endsWith('.' + extension) ? nameInput.value : nameInput.value + '.' + extension;
-  }
-  else {
-    saveA.download = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.' + extension;
-  }
-
-  saveA.click();
-}
-
-// Note that `gap` is the space between two lines of text and the text is placed
-// in the middle of the line, so each line of text is surrounded by two measures
-// of half of the gap, one at the top and one at the bottom. This means that the
-// first line of the text in the text area is padded by the top padding but also
-// the half of the line gap. When placing the hint lines directly below the text
-// line in relationship to the line height, we need to calculate half of the gap
-// to get to the top line of the text and then add two measures of the height of
-// the line, one to skip over the actual line of text and another to specify the
-// bottom line of the SVG text line, because in SVG the `text` element attribute
-// `y` refers to the baseline of the text, not the ascent line.
-//
-// Note that while we could directly pass the SVG into the background URL in the
-// form of a data URI, that looks ugly in the Elements pane. Instead, a blob can
-// be used to give a blob URI to use in the CSS background URL. Care needs to be
-// take to revoke the URL each time we are replacing it if there already was one
-// in order to avoid memory leaks.
-//
-/** @param {string[]} hints */
-function renderHints(hints) {
-  const style = getComputedStyle(textArea);
-  const { font, paddingLeft, paddingTop, fontSize, lineHeight, backgroundImage } = style;
-  const text = +fontSize.slice(0, -'px'.length);
-  const line = +lineHeight.slice(0, -'px'.length);
-  const gap = line - text;
-  const x = +paddingLeft.slice(0, -'px'.length);
-  let y = +paddingTop.slice(0, -'px'.length) + (gap / 2) + text * 2;
-  let svg = `<svg width="${textArea.scrollWidth}" height="${textArea.scrollHeight}" xmlns="http://www.w3.org/2000/svg">`;
-  svg += `<style>text { fill: silver; font: ${font}; }</style>`;
-
-  for (const hint of hints) {
-    svg += `<text x="${x}" y="${y}">${hint}</text>`;
-    y += line;
-  }
-
-  svg += '</svg>';
-
-  let url = backgroundImage.slice('url('.length, -')'.length);
-  if (url) {
-    URL.revokeObjectURL(url);
-  }
-
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  url = URL.createObjectURL(blob);
-
-  textArea.style.background = `url('${url}') ${-textArea.scrollLeft + 'px'} ${-textArea.scrollTop + 'px'} no-repeat`;
-}
-
-/** @param {string[]} args */
-/** @param {({ name: string; } & ({ type: 'string'; } | { type: 'number'; } | { type: 'enum'; options: string[]; }))[]} requiredParams */
-/** @param {({ name: string; } & ({ type: 'string'; default: string; } | { type: 'number'; default: number; } | { type: 'enum'; options: string[]; default: string; }))[]} optionalParams */
-function checkArguments(args, requiredParams, optionalParams = []) {
-  const values = {};
-  const hints = [];
-
-  const params = [...requiredParams, ...optionalParams];
-  for (let index = 0; index < params.length; index++) {
-    const arg = args[index];
-    const param = params[index];
-
-    // Short-circuit in case not all arguments are provided yet, are `undefined`
-    if (arg === undefined) {
-      // Generate an error only if the param is required, not already optional
-      if (index < requiredParams.length) {
-        hints.push('argument missing: ' + param.name);
-        break;
-      }
-
-      // Use the fallback value as the value of the optional argument
-      // Note that this will be `undefined` if no default is defined and also
-      // the default value is not type-checked as it bypasses the type checks,
-      // so invalid enum value or a non-numerical number can be returned.
-      values[param.name] = param.default;
-      continue;
-    }
-
-    switch (param.type) {
-      // Pass string arguments as-is, no parsing is needed
-      case 'string': {
-        values[param.name] = arg;
-        break;
-      }
-      // Convert numerical arguments to actual JavaScript numbers
-      case 'number': {
-        const value = +arg;
-
-        if (Number.isNaN(value)) {
-          hints.push(`${param.name}: '${arg}' is not a number`);
-        }
-        else {
-          values[param.name] = value;
-        }
-
-        break;
-      }
-      case 'enum': {
-        if (!param.options.includes(arg)) {
-          hints.push(`${param.name}: '${arg}' is not in ${param.options}`);
-        }
-        else {
-          values[param.name] = value;
-        }
-
-        break;
-      }
-      case 'boolean': {
-        if (arg !== 'true' && arg !== 'false' && arg !== '0' && arg !== '1') {
-          hints.push(`${param.name}: '${arg}' is not a boolean (true/false, 1/0)`);
-        }
-        else {
-          values[param.name] = arg === 'true' || arg === '1';
-        }
-
-        break;
-      }
-      default: {
-        throw new Error(`Invalid '${param.name}' param type '${param.type}'! Need one of string, number, enum.`);
-      }
-    }
-  }
-
-  if (args.length > params.length) {
-    hints.push((args.length - params.length) + ' too many arguments');
-  }
-
-  return { hint: hints.join(' | '), values };
-}
