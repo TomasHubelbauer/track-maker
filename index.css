@@ -2,6 +2,10 @@ body {
   font: icon;
 }
 
+header strong {
+  margin: 0 1em 0 0;
+}
+
 main {
   display: flex;
   gap: 1ex;
