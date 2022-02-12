@@ -26,9 +26,9 @@ Currently I am hacking this using the `quadraticCurveTo` canvas context API
 method, but it cannot create a perfect circle:
 
 ```
-a 100 -100 50 false
+a 100 -100 50
 a 100 100 50 true
-a -100 100 50 false
+a -100 100 50
 a -100 -100 50 true
 ```
 
