@@ -201,19 +201,16 @@ function render() {
   context.moveTo(panX, panY);
 
   const hints = [];
-  const lines = textArea.value.split('\n');
+  const lines = textArea.value.split('\n').map(line => line.trim());
   next: for (const line of lines) {
-    const [command, ...args] = line.trim().split(' ');
+    // Skip commented out or empty lines but push a hint to keep 1:1 with lines
+    if (line === '' || line.startsWith('//')) {
+      hints.push('');
+      continue;
+    }
+
+    const [command, ...args] = line.split(' ').map(part => part.trim());
     switch (command) {
-      // Skip over empty lines but still push empty hint to preserve 1:1 link
-      case '': {
-        hints.push('');
-        break;
-      }
-      case '//': {
-        hints.push('skipped');
-        break;
-      }
       case 'reference': case 'ref': {
         const { hint, values: { url, x, y } } = checkArguments(args, { name: 'url', type: 'string' }, { name: 'x', type: 'number' }, { name: 'y', type: 'number' });
         if (hint) {
