@@ -25,9 +25,7 @@ canvas.addEventListener('mousemove', event => {
   render();
 });
 
-canvas.addEventListener('mouseleave', () => coordsDiv.textContent = '');
-
-
+canvas.addEventListener('mouseleave', () => coordsDiv.textContent = '0×0');
 canvas.addEventListener('wheel', event => {
   // Prevent the whole page from zooming in and out or scrolling if scrollable
   event.preventDefault();
@@ -74,6 +72,25 @@ textArea.placeholder = 'line (l) / horizontal-line (h/x) / vertical-line (v/y) /
 // Dispatch `input` event even for initial text recovery so the associated event
 // handler runs even on the initial page load.
 textArea.dispatchEvent(new Event('input'));
+
+zoomDiv.addEventListener('click', () => {
+  zoom = 1;
+
+  // Display the current zoom level in the status bar
+  zoomDiv.textContent = ~~(zoom * 100) + ' %';
+
+  // Discard rendering hints as the source code has not changed by panning
+  render();
+});
+
+coordsDiv.addEventListener('click', () => {
+  // Center the origin within the viewport at startup (coerce to whole numbers)
+  panX = ~~(canvas.clientWidth / 2);
+  panY = ~~(canvas.clientHeight / 2);
+
+  // Discard rendering hints as the source code has not changed by panning
+  render();
+});
 
 function render() {
   const { width, height } = canvas.getBoundingClientRect();

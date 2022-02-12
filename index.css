@@ -38,10 +38,6 @@ footer {
 
 footer div {
   border: 1px inset whitesmoke;
+  cursor: pointer;
   padding: 0 1ex;
-}
-
-footer div:empty {
-  /* Prevent the flex gap from showing around empty status bar items */
-  display: none;
 }
