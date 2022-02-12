@@ -50,20 +50,6 @@ not added it yet.
 The vertical axis seems to be reversed in OpenSCAD and probably CAD in general,
 so this tool should reflect that.
 
-### Add support for optional arguments and support resizing and cropping the ref
-
-The reference might be able to use some cropping and resizing, but it will not
-always be necessary, so for good user experience, let's add support for making
-some parameters in `checkArguments` optional. It will likely be enough to make
-the first one as optional, but it will mean we need to check and warn when the
-follow-on ones aren't marked as such. Maybe it will be better to redo the API of
-the `checkArguments` method and have two arrays, one for required and one for
-optional parameters. I'll need to think about the effort/gain ratios of various
-options here. In the first iteration, I will likely just add the flag to every
-argument and should a missing argument error come up, I will wrap that in a
-condition not to check that if the argument is optional and probably short
-circuit.
-
 ### Make the viewport zoom in and out of the point at which the cursor is
 
 Currently it zooms in and out from the origin, but I think this could be

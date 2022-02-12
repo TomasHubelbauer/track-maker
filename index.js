@@ -212,7 +212,13 @@ function render() {
     const [command, ...args] = line.split(' ').map(part => part.trim());
     switch (command) {
       case 'reference': case 'ref': {
-        const { hint, values: { url, x, y } } = checkArguments(args, { name: 'url', type: 'string' }, { name: 'x', type: 'number' }, { name: 'y', type: 'number' });
+        const { hint, values: { url, x, y } } = checkArguments(args, [
+          { name: 'url', type: 'string' }
+        ], [
+          { name: 'x', type: 'number', default: 0 },
+          { name: 'y', type: 'number', default: 0 }
+        ]);
+
         if (hint) {
           hints.push(hint);
           break next;
@@ -233,7 +239,10 @@ function render() {
         break;
       }
       case 'horizontal-line': case 'h': case 'x': {
-        const { hint, values: { x } } = checkArguments(args, { name: 'x', type: 'number' });
+        const { hint, values: { x } } = checkArguments(args, [
+          { name: 'x', type: 'number' }
+        ]);
+
         if (hint) {
           hints.push(hint);
           break next;
@@ -245,7 +254,10 @@ function render() {
         break;
       }
       case 'vertical-line': case 'v': case 'y': {
-        const { hint, values: { y } } = checkArguments(args, { name: 'y', type: 'number' });
+        const { hint, values: { y } } = checkArguments(args, [
+          { name: 'y', type: 'number' }
+        ]);
+
         if (hint) {
           hints.push(hint);
           break next;
@@ -257,7 +269,11 @@ function render() {
         break;
       }
       case 'line': case 'l': {
-        const { hint, values: { x, y } } = checkArguments(args, { name: 'x', type: 'number' }, { name: 'y', type: 'number' });
+        const { hint, values: { x, y } } = checkArguments(args, [
+          { name: 'x', type: 'number' },
+          { name: 'y', type: 'number' }
+        ]);
+
         if (hint) {
           hints.push(hint);
           break next;
@@ -270,7 +286,14 @@ function render() {
         break;
       }
       case 'arc': case 'a': {
-        const { hint, values: { x, y, radius, flip } } = checkArguments(args, { name: 'x', type: 'number' }, { name: 'y', type: 'number' }, { name: 'radius', type: 'number' }, { name: 'flip', type: 'boolean' });
+        const { hint, values: { x, y, radius, flip } } = checkArguments(args, [
+          { name: 'x', type: 'number' },
+          { name: 'y', type: 'number' },
+          { name: 'radius', type: 'number' }
+        ], [
+          { name: 'flip', type: 'boolean' }
+        ]);
+
         if (hint) {
           hints.push(hint);
           break next;
@@ -382,19 +405,31 @@ function renderHints(hints) {
 }
 
 /** @param {string[]} args */
-/** @param {({ name: string; } & ({ type: 'string'; } | { type: 'number'; } | { type: 'enum'; options: string[]; }))[]} params */
-function checkArguments(args, ...params) {
+/** @param {({ name: string; } & ({ type: 'string'; } | { type: 'number'; } | { type: 'enum'; options: string[]; }))[]} requiredParams */
+/** @param {({ name: string; } & ({ type: 'string'; default: string; } | { type: 'number'; default: number; } | { type: 'enum'; options: string[]; default: string; }))[]} optionalParams */
+function checkArguments(args, requiredParams, optionalParams = []) {
   const values = {};
   const hints = [];
 
+  const params = [...requiredParams, ...optionalParams];
   for (let index = 0; index < params.length; index++) {
     const arg = args[index];
     const param = params[index];
 
     // Short-circuit in case not all arguments are provided yet, are `undefined`
     if (arg === undefined) {
-      hints.push('argument missing: ' + param.name);
-      break;
+      // Generate an error only if the param is required, not already optional
+      if (index < requiredParams.length) {
+        hints.push('argument missing: ' + param.name);
+        break;
+      }
+
+      // Use the fallback value as the value of the optional argument
+      // Note that this will be `undefined` if no default is defined and also
+      // the default value is not type-checked as it bypasses the type checks,
+      // so invalid enum value or a non-numerical number can be returned.
+      values[param.name] = param.default;
+      continue;
     }
 
     switch (param.type) {
