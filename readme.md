@@ -85,6 +85,10 @@ a reference file whose name matches one of those unsatisfied references, update
 the cache entry so that the local reference becomes resolved and do not add it
 as a new reference command on top of the file.
 
+If a reference is opened that has a name that is already in the cache, tell the
+user and stop so that we only have unique names in the cache. We can't see the
+directory name of the file, so we can't distinguish files by that.
+
 ### Warn about local references not being associated with the file while saving
 
 Once the user goes to save the file, if there are local, non-URL references,
