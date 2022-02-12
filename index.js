@@ -31,11 +31,11 @@ canvas.addEventListener('gesturechange', event => {
 });
 
 canvas.addEventListener('wheel', event => {
+  // Prevent the whole page from zooming in and out or scrolling if scrollable
+  event.preventDefault();
+
   // Handle pinch-to-zoom on the touch pad which presents as wheel+the Ctrl key
   if (event.ctrlKey) {
-    // Prevent the whole page from zooming in and out
-    event.preventDefault();
-
     // Reverse the sign of the delta as in this case it seems to be opposite…
     zoom += -event.deltaY / 100;
   }
