@@ -1,5 +1,9 @@
+/** @type {HTMLInputElement} */
+const fileInput = document.querySelector('#fileInput');
 /** @type {HTMLAnchorElement} */
 const saveA = document.querySelector('#saveA');
+/** @type {HTMLButtonElement} */
+const openButton = document.querySelector('#openButton');
 /** @type {HTMLButtonElement} */
 const saveButton = document.querySelector('#saveButton');
 /** @type {HTMLButtonElement} */
@@ -19,6 +23,22 @@ let panY = ~~(canvas.clientHeight / 2);
 
 let zoom = 1;
 
+fileInput.addEventListener('change', async () => {
+  if (fileInput.files.length === 0) {
+    return;
+  }
+
+  if (fileInput.files.length > 1) {
+    alert('Too many files have been selected. Please select only one.');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  nameInput.value = file.name.endsWith('.thtm') ? file.name.slice(0, -'.thtm'.length) : file.name;
+  textArea.value = await file.text();
+  textArea.dispatchEvent(new Event('input'));
+});
+
 saveA.addEventListener('click', () => {
   // Free memory occupied by the blob, but only after it has been downloaded
   // Note that the setTimeout is required as freeing immediately would prevent
@@ -27,6 +47,8 @@ saveA.addEventListener('click', () => {
   // to fetch it.
   window.setTimeout(() => URL.revokeObjectURL(saveA.href), 0);
 });
+
+openButton.addEventListener('click', () => fileInput.click());
 
 saveButton.addEventListener('click', () => {
   const blob = new Blob([textArea.value], { type: 'text/plain' });
