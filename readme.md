@@ -91,11 +91,6 @@ will be parallel to the export to OpenSCAD/STL/GCode feature I am planning, the
 difference being that this feature will work with the raw source code this tool
 is processing.
 
-### Display current zoom level in the status bar
-
-Split it into parts and update only the zoom part, the other part being the
-current coordinates in the CAD coordinate space for now.
-
 ### Make the viewport zoom in and out of the point at which the cursor is
 
 Currently it zooms in and out from the origin, but I think this could be
