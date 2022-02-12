@@ -50,25 +50,6 @@ not added it yet.
 The vertical axis seems to be reversed in OpenSCAD and probably CAD in general,
 so this tool should reflect that.
 
-### Implement opening a reference to trace over from a local file
-
-I have implemented opening references from a URL, but local file will be needed
-as well.
-
-In that case, force-open a file selector modal and once the file is selected, it
-will automatically add its name as the command's argument so that it knows not
-to ask for the file again - it will be in the `cache`.
-
-If the user changes the name, the application will open the file selector modal
-again letting them choose another file or cancel. Choosing a new file will make
-the file name argument of the command the name of the new file. Canceling will
-reset the changes the user made to the file name to the file name selected last.
-
-Since there can be multiple references, it is important to cross-check the caret
-position when a name of a local file reference is edited and when a new file is
-chosen, update the argument of that reference and not the first/last reference
-or something silly like that.
-
 ### Add support for optional arguments and support resizing and cropping the ref
 
 The reference might be able to use some cropping and resizing, but it will not
@@ -96,3 +77,36 @@ looks 3D.
 ### Ask whether to save / rewrite the current draft when opening a new file
 
 Currently the draft if thrown away if a file is open while the draft is unsaved.
+
+### Associate opened reference with an existing unsatisfied reference command
+
+In case there are unsatisfied file references in the document and the user opens
+a reference file whose name matches one of those unsatisfied references, update
+the cache entry so that the local reference becomes resolved and do not add it
+as a new reference command on top of the file.
+
+### Warn about local references not being associated with the file while saving
+
+Once the user goes to save the file, if there are local, non-URL references,
+tell them these will not be saved with the file and to save the file in a
+directory where all the used references are saved by their names used in the
+`reference` command.
+
+### Display possible references when there are any in the cache but no match
+
+For local file, non-URL references, if the file name has no match in the cache,
+display a different error message from the failure to download one for URL based
+references in the line hint. Something like "unknown reference name.ext | known:
+1.ext, 2.ext, 3.ext".
+
+Probably offer only cached local file references that are not already used in
+the document. But maybe this is not necessary? Not sure yet.
+
+This will make it so that when the user msitakenly changes the reference name in
+the source code, they will realize they can fix the name back up and get the
+local file reference working again.
+
+If there is nothing to offer in the cache, display a message that encourages the
+user to use the Reference button to open references and have the app associate
+them by the opened file name to the existing `reference` commands instead of
+creating new commands, as per another to-do in this list.

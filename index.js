@@ -1,5 +1,7 @@
 /** @type {HTMLInputElement} */
 const fileInput = document.querySelector('#fileInput');
+/** @type {HTMLInputElement} */
+const referenceInput = document.querySelector('#referenceInput');
 /** @type {HTMLAnchorElement} */
 const saveA = document.querySelector('#saveA');
 /** @type {HTMLButtonElement} */
@@ -8,6 +10,8 @@ const openButton = document.querySelector('#openButton');
 const saveButton = document.querySelector('#saveButton');
 /** @type {HTMLButtonElement} */
 const exportButton = document.querySelector('#exportButton');
+/** @type {HTMLButtonElement} */
+const referenceButton = document.querySelector('#referenceButton');
 /** @type {HTMLInputElement} */
 const nameInput = document.querySelector('#nameInput');
 const canvas = document.querySelector('canvas');
@@ -41,6 +45,23 @@ fileInput.addEventListener('change', async () => {
   textArea.dispatchEvent(new Event('input'));
 });
 
+referenceInput.addEventListener('change', () => {
+  if (referenceInput.files.length === 0) {
+    return;
+  }
+
+  if (referenceInput.files.length > 1) {
+    alert('Too many files have been selected. Please select only one.');
+    return;
+  }
+
+  const file = referenceInput.files[0];
+  const url = URL.createObjectURL(file);
+  cacheReference(url, file.name);
+
+  textArea.value = `reference ${file.name} 0 0\n` + textArea.value;
+});
+
 saveA.addEventListener('click', () => {
   // Free memory occupied by the blob, but only after it has been downloaded
   // Note that the setTimeout is required as freeing immediately would prevent
@@ -68,6 +89,8 @@ saveButton.addEventListener('click', () => {
 exportButton.addEventListener('click', () => {
   alert('OpenSCAD / STL / GCode export is not implemented yet.');
 });
+
+referenceButton.addEventListener('click', () => referenceInput.click());
 
 canvas.addEventListener('mousemove', event => {
   coordsDiv.textContent = `${event.offsetX - panX}×${event.offsetY - panY}`;
@@ -184,27 +207,15 @@ function render() {
         }
 
         if (cache[url]) {
-          hints.push(cache[url].status);
-          const img = cache[url].img;
-          context.drawImage(img, panX + x * zoom, panY + y * zoom, img.naturalWidth * zoom, img.naturalHeight * zoom);
+          const { status, img } = cache[url];
+          hints.push(status);
+          if (img) {
+            context.drawImage(img, panX + x * zoom, panY + y * zoom, img.naturalWidth * zoom, img.naturalHeight * zoom);
+          }
         }
         else {
           hints.push('downloading…');
-
-          const img = document.createElement('img');
-          img.src = url;
-
-          img.addEventListener('load', () => {
-            const metadata = `${img.naturalWidth}×${img.naturalHeight}`;
-            cache[url] = { status: 'downloaded, ' + metadata, img };
-            textArea.dispatchEvent(new Event('input'));
-            cache[url] = { status: 'cached, ' + metadata, img };
-          });
-
-          img.addEventListener('error', () => {
-            cache[url] = { status: 'failed to download' };
-            textArea.dispatchEvent(new Event('input'));
-          });
+          cacheReference(url);
         }
 
         break;
@@ -276,6 +287,24 @@ function render() {
 
   context.stroke();
   return hints;
+}
+
+/** @param {string} url */
+function cacheReference(url, name) {
+  const img = document.createElement('img');
+  img.src = url;
+
+  img.addEventListener('load', () => {
+    const metadata = `${img.naturalWidth}×${img.naturalHeight}`;
+    cache[name ?? url] = { status: 'downloaded, ' + metadata, img };
+    textArea.dispatchEvent(new Event('input'));
+    cache[name ?? url] = { status: 'cached, ' + metadata, img };
+  });
+
+  img.addEventListener('error', () => {
+    cache[name ?? url] = { status: 'failed to download' };
+    textArea.dispatchEvent(new Event('input'));
+  });
 }
 
 // Note that `gap` is the space between two lines of text and the text is placed
