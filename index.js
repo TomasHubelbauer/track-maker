@@ -43,6 +43,11 @@ canvas.addEventListener('wheel', event => {
     zoom += event.deltaY / 100;
   }
 
+  // Prevent negative zoom as it results in flipping the sketch around
+  if (zoom < 0) {
+    zoom = 0;
+  }
+
   // Discard rendering hints as the source code has not changed by panning
   render();
 });
