@@ -71,6 +71,18 @@ is triangles only, so I will need both discrete and continuous solutions or just
 the discrete one if I decide to drop GCode import and generate GCode with lines
 only and no curves.
 
+I could also add another tool, a step or similar. This would be used for tracing
+and it would work by accepting one argument: an angle. It would draw a line in
+the direction given by the angle, but a very short one, forcing tracing with
+enough detail in all cases. This would help to build the polyline faster around
+curved shapes where I might be otherwise tempted to sample less points if I had
+to calculate them. This resulting polyline would be subjected to the process I
+described in the previous commit: a programmatic way akin to taking a thick
+brush or marker and sliding it across the internal side of the shape to get the
+smoothed shape which would have all spikes dulled by its radius and all corners
+made into fillets by its radius. I am going to prototype this to see how
+feasible it would be.
+
 ## To-Do
 
 ### Tweak the `arc` or `quadraticCurve` commands to achieve the arc I want
