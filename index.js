@@ -27,9 +27,6 @@ canvas.addEventListener('mousemove', event => {
 
 canvas.addEventListener('mouseleave', () => coordsDiv.textContent = '');
 
-canvas.addEventListener('gesturechange', event => {
-  console.log(event.scale);
-});
 
 canvas.addEventListener('wheel', event => {
   // Prevent the whole page from zooming in and out or scrolling if scrollable
