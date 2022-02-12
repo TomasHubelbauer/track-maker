@@ -83,6 +83,8 @@ smoothed shape which would have all spikes dulled by its radius and all corners
 made into fillets by its radius. I am going to prototype this to see how
 feasible it would be.
 
+https://math.stackexchange.com/a/797891/117720
+
 ## To-Do
 
 ### Tweak the `arc` or `quadraticCurve` commands to achieve the arc I want
