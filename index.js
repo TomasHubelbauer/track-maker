@@ -308,6 +308,7 @@ function render() {
 }
 
 /** @param {string} url */
+/** @param {string} name */
 function cacheReference(url, name) {
   const img = document.createElement('img');
   img.src = url;
