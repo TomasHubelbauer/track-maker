@@ -2,7 +2,7 @@ body {
   font: icon;
 }
 
-div {
+main {
   display: flex;
   gap: 1ex;
   margin: 1ex 0;
