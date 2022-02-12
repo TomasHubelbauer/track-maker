@@ -4,8 +4,8 @@ body {
 
 main {
   display: flex;
-  gap: 1em;
-  margin: 1ex 0;
+  gap: 1ex;
+  margin: 1em 0;
 }
 
 canvas, textarea {
