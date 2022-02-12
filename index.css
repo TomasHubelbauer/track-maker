@@ -5,6 +5,7 @@ body {
 div {
   display: flex;
   gap: 1ex;
+  margin: 1ex 0;
 }
 
 canvas, textarea {
