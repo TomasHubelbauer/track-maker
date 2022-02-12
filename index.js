@@ -81,15 +81,7 @@ openButton.addEventListener('click', () => fileInput.click());
 
 saveButton.addEventListener('click', () => {
   const blob = new Blob([textArea.value], { type: 'text/plain' });
-  saveA.href = URL.createObjectURL(blob);
-  if (nameInput.value !== '') {
-    saveA.download = nameInput.value.endsWith('.thtm') ? nameInput.value : nameInput.value + '.thtm';
-  }
-  else {
-    saveA.download = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.thtm';
-  }
-
-  saveA.click();
+  download(blob, 'thtm');
 });
 
 generateOpenScadButton.addEventListener('click', () => {
@@ -105,7 +97,12 @@ exportButton.addEventListener('click', () => {
 });
 
 renderButton.addEventListener('click', () => {
-  alert('Rendering to a file is not implemented yet.');
+  try {
+    canvas.toBlob(blob => download(blob, 'png'));
+  }
+  catch (error) {
+    alert('Problem exporting. Sketches with URL references cannot currently be exported to an image due to CORS.');
+  }
 });
 
 referenceButton.addEventListener('click', () => referenceInput.click());
@@ -324,6 +321,20 @@ function cacheReference(url, name) {
     cache[name ?? url] = { status: 'failed to download' };
     textArea.dispatchEvent(new Event('input'));
   });
+}
+
+/** @param {Blob} blob */
+/** @param {string} extension */
+function download(blob, extension) {
+  saveA.href = URL.createObjectURL(blob);
+  if (nameInput.value !== '') {
+    saveA.download = nameInput.value.endsWith('.' + extension) ? nameInput.value : nameInput.value + '.' + extension;
+  }
+  else {
+    saveA.download = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.' + extension;
+  }
+
+  saveA.click();
 }
 
 // Note that `gap` is the space between two lines of text and the text is placed

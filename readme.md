@@ -115,3 +115,23 @@ Also display a summary line (as opposed to specific command line hints) in the
 UI, either the status bar or the menu bar alongside the Reference button. This
 will be a more user friendly message mentioning how to associate references in
 general as opposed to a brief command line hint.
+
+### Offer a convenience method for converting URL references to local references
+
+When using URL references, the Render button won't work, because due to CORS,
+the canvas is considered to be tainted. I do not think there is a client-side
+workaround for this; if there was one, that would be a break in the browser
+security model and quickly fixed even if I could make use of it for a while.
+
+But what could be done is to collect all of the URL references, bulk-download
+them for the user and the convert the commands to file references based one by
+extracting the file names from the URLs. Afterwards, the UI message informing
+the user of broken local file references would nudge them to open the references
+and they would get associated by name with the now local-based reference
+commands.
+
+It would also be good to enable multi-select of references so this this case is
+smoother for a large number of references.
+
+For now this is on a backburner as I do not need to render with URL references.
+
