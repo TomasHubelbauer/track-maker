@@ -110,3 +110,8 @@ If there is nothing to offer in the cache, display a message that encourages the
 user to use the Reference button to open references and have the app associate
 them by the opened file name to the existing `reference` commands instead of
 creating new commands, as per another to-do in this list.
+
+Also display a summary line (as opposed to specific command line hints) in the
+UI, either the status bar or the menu bar alongside the Reference button. This
+will be a more user friendly message mentioning how to associate references in
+general as opposed to a brief command line hint.
