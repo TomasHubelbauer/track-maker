@@ -1,7 +1,7 @@
 const canvas = document.querySelector('canvas');
 const textArea = document.querySelector('textarea');
-const coordsDiv = document.querySelector('#coordsDiv');
 const zoomDiv = document.querySelector('#zoomDiv');
+const coordsDiv = document.querySelector('#coordsDiv');
 
 const cache = {};
 
