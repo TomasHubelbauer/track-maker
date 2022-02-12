@@ -2,8 +2,19 @@ body {
   font: icon;
 }
 
+header {
+  /* Center the logo vertically */
+  align-items: center;
+  display: flex;
+}
+
 header strong {
   margin: 0 1em 0 0;
+}
+
+header input {
+  margin: 0 0 0 auto;
+  width: 100ex;
 }
 
 main {

@@ -1,3 +1,9 @@
+/** @type {HTMLAnchorElement} */
+const saveA = document.querySelector('#saveA');
+/** @type {HTMLButtonElement} */
+const saveButton = document.querySelector('#saveButton');
+/** @type {HTMLButtonElement} */
+const nameInput = document.querySelector('#nameInput');
 const canvas = document.querySelector('canvas');
 const textArea = document.querySelector('textarea');
 /** @type {HTMLDivElement} */
@@ -12,6 +18,22 @@ let panX = ~~(canvas.clientWidth / 2);
 let panY = ~~(canvas.clientHeight / 2);
 
 let zoom = 1;
+
+saveA.addEventListener('click', () => {
+  // Free memory occupied by the blob, but only after it has been downloaded
+  // Note that the setTimeout is required as freeing immediately would prevent
+  // the browser (Firefox, at least) from offering the file fow download as it
+  // would have been free'd already by the time the browser downloader attempted
+  // to fetch it.
+  window.setTimeout(() => URL.revokeObjectURL(saveA.href), 0);
+});
+
+saveButton.addEventListener('click', () => {
+  const blob = new Blob([textArea.value], { type: 'text/plain' });
+  saveA.href = URL.createObjectURL(blob);
+  saveA.download = (nameInput.value || new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')) + '.thtm';
+  saveA.click();
+});
 
 canvas.addEventListener('mousemove', event => {
   coordsDiv.textContent = `${event.offsetX - panX}×${event.offsetY - panY}`;
