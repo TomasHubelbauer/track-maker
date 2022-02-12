@@ -53,6 +53,24 @@ alone (to make a circle) might not be able to handle it either. I will probably
 be best of implementing all of these and adding interactive handles to the
 canvas so that I can trace them to match the desired shape easily.
 
+Another angle might also be focusing on building a good tracing tool, rounding
+spikes aside, and then to come up with an algorithm that would smooth the spikes
+automatically by providing some minimal radius a spike can be. This would be
+difficult or maybe impossible mathematically: I have no idea how I would go
+about finding a center and arc angles of a circle which fits between two curves
+so that their connection has this minimal radius. But it would probably be
+doable by treating everything as polylines and just brute-forcing the solution
+that way. Basically, render everything as a bunch of polylines, even if traced
+using curve tools and then for each corner, go through pairs of lines among the
+polyline segments within that diameter and see what two lines would give the
+closest result if a circle of the minimal radius was placed between them.
+
+Even if I figured this solution mathematically, I still don't know whether GCode
+OpenSCAD has corresponding arc/ellipse commands I could translate it to and STL
+is triangles only, so I will need both discrete and continuous solutions or just
+the discrete one if I decide to drop GCode import and generate GCode with lines
+only and no curves.
+
 ## To-Do
 
 ### Tweak the `arc` or `quadraticCurve` commands to achieve the arc I want
