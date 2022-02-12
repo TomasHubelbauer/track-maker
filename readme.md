@@ -18,9 +18,47 @@ toggled in `about:config`. **Note:** This will disable CORS for all `file:`
 protocol files, so do not disable this and open file you don't trust in Firefox.
 Ideally, only ever open your own files in Firefox over the `file` protocol.
 
+## Notes
+
+The main feature of this program is supposed to be a method for drawing an arc
+between two points with the minimal amount of effort and inputs. For example,
+when tracing a box, which has corners that are too sharp for the LED strip to
+bend to conform to them, one has to introduce a fillet so that the track has
+a quarter-circle where the sharp corner is in the reference. I want to have a
+command which accepts relative X and Y where the quarter circle should end and
+have it works out how to draw that quarter circle between the two points.
+
+At the same time, the arcs won't always be filleted corners. Some references
+might have spiky bits where again, the LED strip cannot be bent enough to be
+able to follow those exactly, which means the spikes need to be smoother out.
+
+This command should be able to do both of this:
+
+![](arcs.png)
+
+However as I research this, I am realizing that this will likely not be possible
+just by providing two points, because the slopes of the lines the arc is between
+are required information for this to work. And it would not work for specifying
+multiple arcs that follow one directly into another.
+
+So, the canvas APIs I see available, `arcTo`, `arc`, `quadraticCurveTo`,
+`bezierCurveTo`, `ellipse` etc. will all need some sort of a control point or
+another kind of information to be able to determine how to arc exactly so that
+the motion smooths into the previous shape (line or another atc).
+
+I am still in the progress of doing research on this, but as of now, I am pretty
+sure `quadraticCurveTo` and `bezierCurveTo` won't be of use, because neither (?)
+can form a quarter circle, which is needed for the corner case, but `ellipse`
+alone (to make a circle) might not be able to handle it either. I will probably
+be best of implementing all of these and adding interactive handles to the
+canvas so that I can trace them to match the desired shape easily.
+
 ## To-Do
 
 ### Tweak the `arc` or `quadraticCurve` commands to achieve the arc I want
+
+**Note:** This not not up to date with respect to the notes above. I need to do
+more research and then I will update both the notes and this task.
 
 I want to have a command which draws an arc from the current cursor position to
 the point specified by the relative x and y provided to the command. It should

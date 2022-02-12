@@ -2,7 +2,6 @@ import renderHints from './renderHints.js';
 import renderHorizontalLine from './renderHorizontalLine.js';
 import renderVerticalLine from './renderVerticalLine.js';
 import renderLine from './renderLine.js';
-import renderQuadraticCurve from './renderQuadraticCurve.js';
 import renderArc from './renderArc.js';
 import renderReference from './renderReference.js';
 
@@ -16,8 +15,6 @@ const commands = {
   verticalLine: renderVerticalLine,
   l: renderLine,
   line: renderLine,
-  qc: renderQuadraticCurve,
-  quadraticCurve: renderQuadraticCurve,
   a: renderArc,
   arc: renderArc,
   ref: renderReference,
