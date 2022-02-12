@@ -20,25 +20,56 @@ Ideally, only ever open your own files in Firefox over the `file` protocol.
 
 ## To-Do
 
-### Implement arc between two points by specifying radius and flip
+### Tweak the `arc` or `quadraticCurve` commands to achieve the arc I want
 
-Currently I am hacking this using the `quadraticCurveTo` canvas context API
-method, but it cannot create a perfect circle:
+I want to have a command which draws an arc from the current cursor position to
+the point specified by the relative x and y provided to the command. It should
+calculate the radius needed for the arc to connect to both of the points by
+itself.
 
-```
-a 100 -100 50
-a 100 100 50 true
-a -100 100 50
-a -100 -100 50 true
-```
+This problem has infinitely many solutions, because the arc's radius can differ
+while still meeting the requirement of touching both of the points. It is kind
+of like having a balloon and sitting it on top of two straws. As the baloon
+expands, the points at which it touches the straws will remain constant, but
+the length of arc that the baloon creates between the two straws will be smaller
+and smaller fraction of the circumference of the whole baloon.
 
-![](circle.png)
+I would like to default this radius to a value which will make the the arc be a
+quarter of a circle. This will be as if the two points created a corner and we
+expanded the baloon to fit snugly in that corner. Any less and it would not
+touch both of the points. Any more and it would get pushed away from the corner
+by the walls, or alternatively, if there were no walls, it would bulge out past
+the corner.
 
-Using `arcTo` or a polyline with calculated midpoints would be much better. True
-arc being the preferred option here as a polyline would need to accept a number
-of segments to calculate. This value could default to something smooth enough,
-like the larger of the two bounding box dimensions, but it would still not be
-scalable like a true arc and it would generate large output files.
+To tweak the implicit automatically calculated radius, the user could provide an
+optional argument, which would be an offset to the calculated radius to make it
+bigger. Negative values would not be supported - that would mean a radius too
+small for the arc to be able to touch both points.
+
+Another optional argument will be a boolean flag about whether the "corner" made
+by the two points should be the alternative solution. This is because any two
+points can be connected by two isosceles right triangles - two corners. We will
+default to one where calculating the third point is done by increasing both axes
+in the positive direction, the other one has one of the axes going in a negative
+direction.
+
+There is this resource which seems to have the right math:
+https://stackoverflow.com/a/58824801/2715716
+
+But it works out arguments for the Windows API for drawing an arc which differs
+from the web API. I will need to bridge that gap.
+
+It might be possible that neither `quadraticCurveTo` nor `arcTo` will be able to
+produce the desired result (I am not sure if either can make a quarter circle),
+in which case I still need to figure this out, but there are a few more concerns
+relating to both display and export:
+
+- What to use for display of true quarter circle? A polyline with many segments?
+  - The number of segments could be the larger side of the bounding box to get
+    the desired smoothness in the preview
+- What to do about GCode export? Does it have arc or circle/ellipse commands?
+  If so, I would like to use those, but maybe I will need to do it the same way
+  I expected I will need to do OpenSCAD and STL: by using a fat polyline.
 
 ### Implement OpenSCAD/STL/GCode export
 
