@@ -1,4 +1,3 @@
-import renderHints from './renderHints.js';
 import download from './download.js';
 import { set } from './references.js';
 import render from './render.js';
@@ -7,6 +6,8 @@ import render from './render.js';
 const fileInput = document.querySelector('#fileInput');
 /** @type {HTMLInputElement} */
 const referenceInput = document.querySelector('#referenceInput');
+/** @type {HTMLAnchorElement} */
+const downloadA = document.querySelector('#downloadA');
 /** @type {HTMLButtonElement} */
 const openButton = document.querySelector('#openButton');
 /** @type {HTMLButtonElement} */
@@ -64,25 +65,25 @@ referenceInput.addEventListener('change', () => {
 
   const file = referenceInput.files[0];
   const url = URL.createObjectURL(file);
-  set(url, file.name);
+  set(url, file.name, paint);
 
   textArea.value = `reference ${file.name} 0 0\n` + textArea.value;
 });
 
-saveA.addEventListener('click', () => {
+downloadA.addEventListener('click', () => {
   // Free memory occupied by the blob, but only after it has been downloaded
   // Note that the setTimeout is required as freeing immediately would prevent
   // the browser (Firefox, at least) from offering the file fow download as it
   // would have been free'd already by the time the browser downloader attempted
   // to fetch it.
-  window.setTimeout(() => URL.revokeObjectURL(saveA.href), 0);
+  window.setTimeout(() => URL.revokeObjectURL(downloadA.href), 0);
 });
 
 openButton.addEventListener('click', () => fileInput.click());
 
 saveButton.addEventListener('click', () => {
   const blob = new Blob([textArea.value], { type: 'text/plain' });
-  download(blob, 'thtm');
+  download(blob, 'thtm', downloadA, nameInput);
 });
 
 generateOpenScadButton.addEventListener('click', () => {
@@ -99,7 +100,7 @@ exportButton.addEventListener('click', () => {
 
 renderButton.addEventListener('click', () => {
   try {
-    canvas.toBlob(blob => download(blob, 'png'));
+    canvas.toBlob(blob => download(blob, 'png', downloadA, nameInput));
   }
   catch (error) {
     alert('Problem exporting. Sketches with URL references cannot currently be exported to an image due to CORS.');
@@ -117,9 +118,7 @@ canvas.addEventListener('mousemove', event => {
 
   panX += event.movementX;
   panY += event.movementY;
-
-  // Discard rendering hints as the source code has not changed by panning
-  render(panX, panY, zoom);
+  paint();
 });
 
 canvas.addEventListener('mouseleave', () => coordsDiv.textContent = '0×0');
@@ -145,14 +144,12 @@ canvas.addEventListener('wheel', event => {
   // Display the current zoom level in the status bar
   zoomDiv.textContent = ~~(zoom * 100) + ' %';
 
-  // Discard rendering hints as the source code has not changed by panning
-  render(panX, panY, zoom);
+  paint();
 });
 
 textArea.addEventListener('input', () => {
   localStorage.setItem('code', textArea.value);
-  const hints = render(panX, panY, zoom);
-  renderHints(hints);
+  paint(true);
 });
 
 // Keep the background SVG image with hints in sync with the text area element's
@@ -173,8 +170,7 @@ zoomDiv.addEventListener('click', () => {
   // Display the current zoom level in the status bar
   zoomDiv.textContent = ~~(zoom * 100) + ' %';
 
-  // Discard rendering hints as the source code has not changed by panning
-  render(panX, panY, zoom);
+  paint();
 });
 
 coordsDiv.addEventListener('click', () => {
@@ -182,10 +178,14 @@ coordsDiv.addEventListener('click', () => {
   panX = ~~(canvas.clientWidth / 2);
   panY = ~~(canvas.clientHeight / 2);
 
-  // Discard rendering hints as the source code has not changed by panning
-  render(panX, panY, zoom);
+  paint();
 });
 
-// Dispatch `input` event even for initial text recovery so the associated event
-// handler runs even on the initial page load.
-textArea.dispatchEvent(new Event('input'));
+/**
+ * @param {boolean} hints 
+ */
+function paint(hints) {
+  render(panX, panY, zoom, canvas, textArea, hints);
+}
+
+paint(true);

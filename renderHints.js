@@ -1,5 +1,3 @@
-const textArea = document.querySelector('textarea');
-
 // Note that `gap` is the space between two lines of text and the text is placed
 // in the middle of the line, so each line of text is surrounded by two measures
 // of half of the gap, one at the top and one at the bottom. This means that the
@@ -17,8 +15,11 @@ const textArea = document.querySelector('textarea');
 // take to revoke the URL each time we are replacing it if there already was one
 // in order to avoid memory leaks.
 //
-/** @param {string[]} hints */
-export default function renderHints(hints) {
+/**
+ * @param {string[]} hints
+ * @param {HTMLTextAreaElement} textArea
+ */
+export default function renderHints(hints, textArea) {
   const style = getComputedStyle(textArea);
   const { font, paddingLeft, paddingTop, fontSize, lineHeight, backgroundImage } = style;
   const text = +fontSize.slice(0, -'px'.length);

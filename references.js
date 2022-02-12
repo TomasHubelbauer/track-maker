@@ -1,7 +1,8 @@
-const textArea = document.querySelector('textarea');
-
 const references = {};
 
+/**
+ * @param {string} name
+ */
 export function get(name) {
   if (references[name]) {
     return references[name];
@@ -10,21 +11,24 @@ export function get(name) {
   return { miss: true };
 }
 
-/** @param {string} url */
-/** @param {string} name */
-export function set(url, name) {
+/**
+ * @param {string} url
+ * @param {string} name
+ * @param {() => void} render
+ */
+export function set(url, name, render) {
   const img = document.createElement('img');
   img.src = url;
 
   img.addEventListener('load', () => {
     const metadata = `${img.naturalWidth}×${img.naturalHeight}`;
-    references[name ?? url] = { status: 'downloaded, ' + metadata, img };
-    textArea.dispatchEvent(new Event('input'));
-    references[name ?? url] = { status: 'cached, ' + metadata, img };
+    references[name] = { status: 'downloaded, ' + metadata, img };
+    render();
+    references[name] = { status: 'cached, ' + metadata, img };
   });
 
   img.addEventListener('error', () => {
-    references[name ?? url] = { status: 'failed to download' };
-    textArea.dispatchEvent(new Event('input'));
+    references[name] = { status: 'failed to download' };
+    render();
   });
 }

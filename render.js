@@ -1,13 +1,15 @@
 import checkArguments from './checkArguments.js';
 import { get, set } from './references.js';
+import renderHints from './renderHints.js';
 
-const canvas = document.querySelector('canvas');
-const textArea = document.querySelector('textarea');
-
-/** @param {number} panX */
-/** @param {number} panY */
-/** @param {number} zoom */
-export default function render(panX, panY, zoom) {
+/**
+ * @param {number} panX
+ * @param {number} panY
+ * @param {number} zoom
+ * @param {HTMLCanvasElement} canvas
+ * @param {HTMLTextAreaElement} textArea
+ */
+export default function render(panX, panY, zoom, canvas, textArea, hint) {
   const { width, height } = canvas.getBoundingClientRect();
   canvas.width = width;
   canvas.height = height;
@@ -46,7 +48,7 @@ export default function render(panX, panY, zoom) {
         const { miss, status, img } = get(url);
         if (miss) {
           hints.push('downloading…');
-          set(url);
+          set(url, url, () => render(panX, panY, zoom, canvas, textArea, true));
         }
         else {
           hints.push(status);
@@ -140,5 +142,7 @@ export default function render(panX, panY, zoom) {
   }
 
   context.stroke();
-  return hints;
+  if (hint) {
+    renderHints(hints, textArea);
+  }
 }

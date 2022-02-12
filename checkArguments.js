@@ -1,6 +1,8 @@
-/** @param {string[]} args */
-/** @param {({ name: string; } & ({ type: 'string'; } | { type: 'number'; } | { type: 'enum'; options: string[]; }))[]} requiredParams */
-/** @param {({ name: string; } & ({ type: 'string'; default: string; } | { type: 'number'; default: number; } | { type: 'enum'; options: string[]; default: string; }))[]} optionalParams */
+/**
+ * @param {string[]} args
+ * @param {({ name: string; } & ({ type: 'string'; } | { type: 'number'; } | { type: 'enum'; options: string[]; }))[]} requiredParams
+ * @param {({ name: string; } & ({ type: 'string'; default: string; } | { type: 'number'; default: number; } | { type: 'enum'; options: string[]; default: string; }))[]} optionalParams
+ */
 export default function checkArguments(args, requiredParams, optionalParams = []) {
   const values = {};
   const hints = [];
