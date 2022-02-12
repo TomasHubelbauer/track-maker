@@ -145,3 +145,25 @@ It has methods for taking over the canvas for 3D orbital navigation as well as
 displaying axis gizmos and so on, so the only question is how much pain will it
 be to add it without compromising on runability from the file protocol and if
 it has an ESM version.
+
+### Consider grouping the menu items into dropdowns
+
+The structure could be:
+
+- File
+  - Open
+  - Save
+- Export
+  - Generate OpenSCAD
+  - Generate GCode
+  - Export STL
+  - Render
+- Reference
+  - Load
+  - Localize
+
+Localize here would be the flow I am considering in another task that would help
+convert URL references to local file references so that rendering out the sketch
+works without CORS issues.
+
+It could also be called just Download; it would bulk-download all references.
