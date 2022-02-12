@@ -3,6 +3,7 @@ import renderHorizontalLine from './renderHorizontalLine.js';
 import renderVerticalLine from './renderVerticalLine.js';
 import renderLine from './renderLine.js';
 import renderQuadraticCurve from './renderQuadraticCurve.js';
+import renderArc from './renderArc.js';
 import renderReference from './renderReference.js';
 
 /** @type {{ [name: string]: (args: string[], cursor: { x: number; y: number; }, context: CanvasRenderingContext2D, panX: number, panY: number, zoom: number, render: (hint: boolean) => void) => string; }} */
@@ -17,6 +18,8 @@ const commands = {
   line: renderLine,
   qc: renderQuadraticCurve,
   quadraticCurve: renderQuadraticCurve,
+  a: renderArc,
+  arc: renderArc,
   ref: renderReference,
   reference: renderReference,
 };
