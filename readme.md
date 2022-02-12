@@ -7,6 +7,15 @@ glued onto an acrylic sheet and mounted to the wall. The LED strips fit into the
 tracks and get soldered together and connected to a barrel jack a wall charger
 can be plugged in to make the logo light.
 
+## Development
+
+When in development, I use this application off a file opened in Firefox through
+the `file:` protocol. This would ordinarily pose issues with CORS and ESM, so I
+turn the Firefox setting `security.fileuri.strict_origin_policy` off. It can be
+toggled in `about:config`. **Note:** This will disable CORS for all `file:`
+protocol files, so do not disable this and open file you don't trust in Firefox.
+Ideally, only ever open your own files in Firefox over the `file` protocol.
+
 ## To-Do
 
 ### Implement arc between two points by specifying radius and flip
