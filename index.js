@@ -31,7 +31,13 @@ saveA.addEventListener('click', () => {
 saveButton.addEventListener('click', () => {
   const blob = new Blob([textArea.value], { type: 'text/plain' });
   saveA.href = URL.createObjectURL(blob);
-  saveA.download = (nameInput.value || new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')) + '.thtm';
+  if (nameInput.value !== '') {
+    saveA.download = nameInput.value.endsWith('.thtm') ? nameInput.value : nameInput.value + '.thtm';
+  }
+  else {
+    saveA.download = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.thtm';
+  }
+
   saveA.click();
 });
 
