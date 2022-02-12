@@ -83,14 +83,6 @@ argument and should a missing argument error come up, I will wrap that in a
 condition not to check that if the argument is optional and probably short
 circuit.
 
-### Add support for local import and export to be able to preserve the models
-
-Saving to and loading from a file should be implemented on top of the current
-behavior of keeping the code stored in the local storage in the browser. This
-will be parallel to the export to OpenSCAD/STL/GCode feature I am planning, the
-difference being that this feature will work with the raw source code this tool
-is processing.
-
 ### Make the viewport zoom in and out of the point at which the cursor is
 
 Currently it zooms in and out from the origin, but I think this could be
@@ -100,3 +92,7 @@ improved.
 
 I am thinking a cross-section of the track from an interesting angle so that it
 looks 3D.
+
+### Ask whether to save / rewrite the current draft when opening a new file
+
+Currently the draft if thrown away if a file is open while the draft is unsaved.
