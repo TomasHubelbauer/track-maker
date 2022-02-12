@@ -1,11 +1,13 @@
 # Track Maker
 
-This repository hosts the very beginning of a tool I intend on creating for the
-purpose of being able to design 3D printable tracks to fit LED strips in. This
-tool will be used to design neon-like wall logos made of these 3D printed tracks
-glued onto an acrylic sheet and mounted to the wall. The LED strips fit into the
-tracks and get soldered together and connected to a barrel jack a wall charger
-can be plugged in to make the logo light.
+This repository hosts a tool I made for the purpose of designing 3D printable
+tracks to fit LED strips in when making wall mounted neon-like LED logos. I am
+using white / natural LED-color strips which silicone sleeves giving them color.
+
+I make these logos by tracing over a reference, designing the tracks, gluing
+them onto an acrylics sheet, fitting the LED strips in them, soldering them
+together to a connector and drilling/soldering mounting holes into the acrylic.
+They run off a commodity 12 V wall charger terminal with a barrel jack.
 
 ## Development
 
