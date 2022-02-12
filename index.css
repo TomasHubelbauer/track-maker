@@ -2,6 +2,10 @@ body {
   font: icon;
 }
 
+input[type="file"] {
+  display: none;
+}
+
 header {
   /* Center the logo vertically */
   align-items: center;
