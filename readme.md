@@ -164,3 +164,9 @@ convert URL references to local file references so that rendering out the sketch
 works without CORS issues.
 
 It could also be called just Download; it would bulk-download all references.
+
+### Add examples of logos I made using this in the readme
+
+I will probably add the Deadbat logo as an example even though it was not made
+with this tool, because it was the motivation to make this tool for future logos
+and as such deserves recognition.
