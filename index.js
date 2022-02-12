@@ -93,10 +93,6 @@ textArea.addEventListener('scroll', () => {
 textArea.value = localStorage.getItem('code');
 textArea.placeholder = 'line (l) / horizontal-line (h/x) / vertical-line (v/y) / arc (a)';
 
-// Dispatch `input` event even for initial text recovery so the associated event
-// handler runs even on the initial page load.
-textArea.dispatchEvent(new Event('input'));
-
 zoomDiv.addEventListener('click', () => {
   zoom = 1;
 
@@ -115,6 +111,10 @@ coordsDiv.addEventListener('click', () => {
   // Discard rendering hints as the source code has not changed by panning
   render();
 });
+
+// Dispatch `input` event even for initial text recovery so the associated event
+// handler runs even on the initial page load.
+textArea.dispatchEvent(new Event('input'));
 
 function render() {
   const { width, height } = canvas.getBoundingClientRect();
