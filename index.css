@@ -30,3 +30,18 @@ textarea {
   padding: 0 1em;
   resize: none;
 }
+
+footer {
+  display: flex;
+  gap: 1ex;
+}
+
+footer div {
+  border: 1px inset whitesmoke;
+  padding: 0 1ex;
+}
+
+footer div:empty {
+  /* Prevent the flex gap from showing around empty status bar items */
+  display: none;
+}

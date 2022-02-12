@@ -1,6 +1,7 @@
 const canvas = document.querySelector('canvas');
 const textArea = document.querySelector('textarea');
-const footer = document.querySelector('footer');
+const coordsDiv = document.querySelector('#coordsDiv');
+const zoomDiv = document.querySelector('#zoomDiv');
 
 const cache = {};
 
@@ -11,7 +12,7 @@ let panY = ~~(canvas.clientHeight / 2);
 let zoom = 1;
 
 canvas.addEventListener('mousemove', event => {
-  footer.textContent = `${event.offsetX - panX}×${event.offsetY - panY}`;
+  coordsDiv.textContent = `${event.offsetX - panX}×${event.offsetY - panY}`;
 
   if (event.buttons !== 1) {
     return;
@@ -24,7 +25,7 @@ canvas.addEventListener('mousemove', event => {
   render();
 });
 
-canvas.addEventListener('mouseleave', () => footer.textContent = '');
+canvas.addEventListener('mouseleave', () => coordsDiv.textContent = '');
 
 canvas.addEventListener('gesturechange', event => {
   console.log(event.scale);
@@ -47,6 +48,9 @@ canvas.addEventListener('wheel', event => {
   if (zoom < 0) {
     zoom = 0;
   }
+
+  // Display the current zoom level in the status bar
+  zoomDiv.textContent = ~~(zoom * 100) + ' %';
 
   // Discard rendering hints as the source code has not changed by panning
   render();
