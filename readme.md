@@ -95,3 +95,8 @@ is processing.
 
 Currently it zooms in and out from the origin, but I think this could be
 improved.
+
+### Create and add a favicon to the web app
+
+I am thinking a cross-section of the track from an interesting angle so that it
+looks 3D.
