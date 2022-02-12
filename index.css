@@ -4,7 +4,7 @@ body {
 
 main {
   display: flex;
-  gap: 1ex;
+  gap: 1em;
   margin: 1ex 0;
 }
 
