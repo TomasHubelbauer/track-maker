@@ -139,3 +139,9 @@ smoother for a large number of references.
 
 For now this is on a backburner as I do not need to render with URL references.
 
+### Consider pulling in something like ThreeJS for 3D preview of the track
+
+It has methods for taking over the canvas for 3D orbital navigation as well as
+displaying axis gizmos and so on, so the only question is how much pain will it
+be to add it without compromising on runability from the file protocol and if
+it has an ESM version.
