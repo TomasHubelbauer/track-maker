@@ -7,6 +7,8 @@ const openButton = document.querySelector('#openButton');
 /** @type {HTMLButtonElement} */
 const saveButton = document.querySelector('#saveButton');
 /** @type {HTMLButtonElement} */
+const exportButton = document.querySelector('#exportButton');
+/** @type {HTMLInputElement} */
 const nameInput = document.querySelector('#nameInput');
 const canvas = document.querySelector('canvas');
 const textArea = document.querySelector('textarea');
@@ -61,6 +63,10 @@ saveButton.addEventListener('click', () => {
   }
 
   saveA.click();
+});
+
+exportButton.addEventListener('click', () => {
+  alert('OpenSCAD / STL / GCode export is not implemented yet.');
 });
 
 canvas.addEventListener('mousemove', event => {
