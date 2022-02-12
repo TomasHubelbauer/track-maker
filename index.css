@@ -10,6 +10,7 @@ header {
   /* Center the logo vertically */
   align-items: center;
   display: flex;
+  gap: 1ex;
 }
 
 header strong {
