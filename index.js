@@ -50,7 +50,8 @@ fileInput.addEventListener('change', async () => {
   const file = fileInput.files[0];
   nameInput.value = file.name.endsWith('.thtm') ? file.name.slice(0, -'.thtm'.length) : file.name;
   textArea.value = await file.text();
-  textArea.dispatchEvent(new Event('input'));
+  localStorage.setItem('code', textArea.value);
+  paint(true);
 });
 
 referenceInput.addEventListener('change', () => {
