@@ -9,7 +9,13 @@ const openButton = document.querySelector('#openButton');
 /** @type {HTMLButtonElement} */
 const saveButton = document.querySelector('#saveButton');
 /** @type {HTMLButtonElement} */
+const generateOpenScadButton = document.querySelector('#generateOpenScadButton');
+/** @type {HTMLButtonElement} */
+const generateGCodeButton = document.querySelector('#generateGCodeButton');
+/** @type {HTMLButtonElement} */
 const exportButton = document.querySelector('#exportButton');
+/** @type {HTMLButtonElement} */
+const renderButton = document.querySelector('#renderButton');
 /** @type {HTMLButtonElement} */
 const referenceButton = document.querySelector('#referenceButton');
 /** @type {HTMLInputElement} */
@@ -86,8 +92,20 @@ saveButton.addEventListener('click', () => {
   saveA.click();
 });
 
+generateOpenScadButton.addEventListener('click', () => {
+  alert('OpenSCAD export is not implemented yet.');
+});
+
+generateGCodeButton.addEventListener('click', () => {
+  alert('GCode export is not implemented yet.');
+});
+
 exportButton.addEventListener('click', () => {
-  alert('OpenSCAD / STL / GCode export is not implemented yet.');
+  alert('STL export is not implemented yet.');
+});
+
+renderButton.addEventListener('click', () => {
+  alert('Rendering to a file is not implemented yet.');
 });
 
 referenceButton.addEventListener('click', () => referenceInput.click());
